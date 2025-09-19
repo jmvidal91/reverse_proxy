@@ -1,7 +1,13 @@
 import express from "express";
 import fetch from "node-fetch";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
+
+// Necesario para armar __dirname en ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Bases de tus flujos en n8n
 const URLS = {
@@ -31,25 +37,34 @@ async function proxyRequest(baseUrl, id, res) {
   }
 }
 
+// === Rutas proxy ===
+
 // QR → /qr/:cajeroId
 app.get("/qr/:cajeroId", (req, res) => {
   proxyRequest(URLS.qr, req.params.cajeroId, res);
 });
 
-// WL Esperas → /wl_esperas/:cuenta_codigo
+// WL Esperas → /wl_esperas/:cuentaCodigo
 app.get("/wl_esperas/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.wl_esperas, req.params.cuentaCodigo, res);
 });
 
-// DB Turnos → /db_turnos/:cuenta_codigo
+// DB Turnos → /db_turnos/:cuentaCodigo
 app.get("/db_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.db_turnos, req.params.cuentaCodigo, res);
 });
 
-// WL Turnos → /wl_turnos/:cuenta_codigo
+// WL Turnos → /wl_turnos/:cuentaCodigo
 app.get("/wl_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.wl_turnos, req.params.cuentaCodigo, res);
 });
 
+// === Favicon ===
+// si acceden a /favicon.ico → sirve tu logo local
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(path.join(__dirname, "favicon.png"));
+});
+
+// Arranque del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Proxy escuchando en puerto ${PORT}`));

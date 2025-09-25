@@ -51,8 +51,24 @@ app.get("/wl_esperas/:cuentaCodigo", (req, res) => {
 });
 
 // DB Turnos → /db_turnos/:cuentaCodigo
-app.get("/db_turnos/:cuentaCodigo", (req, res) => {
-  proxyRequest(URLS.db_turnos, req.params.cuentaCodigo, res);
+// 👉 acá inyectamos el cuentaCodigo dentro del HTML antes de enviarlo
+app.get("/db_turnos/:cuentaCodigo", async (req, res) => {
+  const { cuentaCodigo } = req.params;
+  try {
+    const resp = await fetch(`${URLS.db_turnos}/${cuentaCodigo}`);
+    let html = await resp.text();
+
+    // Inyectar variable global en el <head>
+    html = html.replace(
+      "</head>",
+      `<script>window.CUENTA_CODIGO="${cuentaCodigo}"</script></head>`
+    );
+
+    res.send(html);
+  } catch (err) {
+    console.error("Error en proxy db_turnos:", err);
+    res.status(500).send("Error en proxy db_turnos");
+  }
 });
 
 // WL Turnos → /wl_turnos/:cuentaCodigo

@@ -30,6 +30,16 @@ async function proxyRequest(baseUrl, id, res) {
       return res.json(data);
     }
 
+    if (contentType.includes("text/html")) {
+      let text = await resp.text();
+      // Inyectar variable global + log para debug
+      text = text.replace(
+        "</head>",
+        `<script>console.log("CUENTA_CODIGO desde proxy:", "${id}"); window.CUENTA_CODIGO="${id}"</script></head>`
+      );
+      return res.status(resp.status).send(text);
+    }
+
     const text = await resp.text();
     res.status(resp.status).send(text);
   } catch (err) {
@@ -51,24 +61,8 @@ app.get("/wl_esperas/:cuentaCodigo", (req, res) => {
 });
 
 // DB Turnos → /db_turnos/:cuentaCodigo
-// 👉 acá inyectamos el cuentaCodigo dentro del HTML antes de enviarlo
-app.get("/db_turnos/:cuentaCodigo", async (req, res) => {
-  const { cuentaCodigo } = req.params;
-  try {
-    const resp = await fetch(`${URLS.db_turnos}/${cuentaCodigo}`);
-    let html = await resp.text();
-
-    // Inyectar variable global en el <head>
-    html = html.replace(
-      "</head>",
-      `<script>window.CUENTA_CODIGO="${cuentaCodigo}"</script></head>`
-    );
-
-    res.send(html);
-  } catch (err) {
-    console.error("Error en proxy db_turnos:", err);
-    res.status(500).send("Error en proxy db_turnos");
-  }
+app.get("/db_turnos/:cuentaCodigo", (req, res) => {
+  proxyRequest(URLS.db_turnos, req.params.cuentaCodigo, res);
 });
 
 // WL Turnos → /wl_turnos/:cuentaCodigo
@@ -82,7 +76,6 @@ app.get("/refresh_turnos/:cuentaCodigo", (req, res) => {
 });
 
 // === Favicon ===
-// si acceden a /favicon.ico → sirve tu logo local
 app.get("/favicon.ico", (req, res) => {
   res.sendFile(path.join(__dirname, "favicon.png"));
 });

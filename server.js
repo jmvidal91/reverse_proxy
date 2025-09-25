@@ -15,6 +15,7 @@ const URLS = {
   wl_esperas: "https://n8n-railway-production-2eac.up.railway.app/webhook/2d4f1b37-c818-460d-8277-3596603fa484/monitor-pedidos",
   db_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/a5afc7b2-5131-4fdd-8425-492551de3a37/db_turnos",
   wl_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/df0a82f5-cb1b-4a36-93d2-e1e06f396cb3/lista-espera",
+  refresh_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/a5afc7b2-5131-4fdd-8425-492551de3a37/refresh_turnos",
 };
 
 // Helper genérico
@@ -57,6 +58,11 @@ app.get("/db_turnos/:cuentaCodigo", (req, res) => {
 // WL Turnos → /wl_turnos/:cuentaCodigo
 app.get("/wl_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.wl_turnos, req.params.cuentaCodigo, res);
+});
+
+// WH refresh_turnos → /refresh_turnos/:cuentaCodigo
+app.get("/refresh_turnos/:cuentaCodigo", (req, res) => {
+  proxyRequest(URLS.refresh_turnos, req.params.cuentaCodigo, res);
 });
 
 // === Favicon ===

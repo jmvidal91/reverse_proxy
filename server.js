@@ -14,6 +14,7 @@ const URLS = {
   qr: "https://n8n-railway-production-2eac.up.railway.app/webhook/a4c766df-0e23-4b54-925f-2d25af02d024/qr",
   wl_esperas: "https://n8n-railway-production-2eac.up.railway.app/webhook/2d4f1b37-c818-460d-8277-3596603fa484/monitor-pedidos",
   db_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/a5afc7b2-5131-4fdd-8425-492551de3a37/db_turnos",
+  db_pedidos: "https://n8n-railway-production-2eac.up.railway.app/webhook/1ad9d796-c62e-4005-9c69-04dddfbf5479/db_pedidos",
   wl_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/df0a82f5-cb1b-4a36-93d2-e1e06f396cb3/lista-espera",
   refresh_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/a5afc7b2-5131-4fdd-8425-492551de3a37/refresh_turnos",
 };
@@ -58,6 +59,11 @@ app.get("/db_turnos/:cuentaCodigo", (req, res) => {
 // WL Turnos → /wl_turnos/:cuentaCodigo
 app.get("/wl_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.wl_turnos, req.params.cuentaCodigo, res);
+});
+
+// DB Pedidos → /db_pedidos/:cuentaCodigo
+app.get("/db_pedidos/:cuentaCodigo", (req, res) => {
+  proxyRequest(URLS.db_pedidos, req.params.cuentaCodigo, res);
 });
 
 // WH refresh_turnos → /refresh_turnos/:cuentaCodigo

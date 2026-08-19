@@ -19,7 +19,11 @@ const URLS = {
   refresh_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/a5afc7b2-5131-4fdd-8425-492551de3a37/refresh_turnos",
 };
 
-// Helper genérico
+const REDIRECTS = {
+  pt_vea: "https://vea-turnos-prototipo.callappsystem.chatgpt.site",
+};
+
+// Helper generico
 async function proxyRequest(baseUrl, id, res) {
   try {
     const url = `${baseUrl}/${id}`;
@@ -41,42 +45,47 @@ async function proxyRequest(baseUrl, id, res) {
 
 // === Rutas proxy ===
 
-// QR → /qr/:cajeroId
+// QR -> /qr/:cajeroId
 app.get("/qr/:cajeroId", (req, res) => {
   proxyRequest(URLS.qr, req.params.cajeroId, res);
 });
 
-// WL Esperas → /wl_esperas/:cuentaCodigo
+// WL Esperas -> /wl_esperas/:cuentaCodigo
 app.get("/wl_esperas/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.wl_esperas, req.params.cuentaCodigo, res);
 });
 
-// DB Turnos → /db_turnos/:cuentaCodigo
+// DB Turnos -> /db_turnos/:cuentaCodigo
 app.get("/db_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.db_turnos, req.params.cuentaCodigo, res);
 });
 
-// WL Turnos → /wl_turnos/:cuentaCodigo
+// WL Turnos -> /wl_turnos/:cuentaCodigo
 app.get("/wl_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.wl_turnos, req.params.cuentaCodigo, res);
 });
 
-// DB Pedidos → /db_pedidos/:cuentaCodigo
+// DB Pedidos -> /db_pedidos/:cuentaCodigo
 app.get("/db_pedidos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.db_pedidos, req.params.cuentaCodigo, res);
 });
 
-// WH refresh_turnos → /refresh_turnos/:cuentaCodigo
+// WH refresh_turnos -> /refresh_turnos/:cuentaCodigo
 app.get("/refresh_turnos/:cuentaCodigo", (req, res) => {
   proxyRequest(URLS.refresh_turnos, req.params.cuentaCodigo, res);
 });
 
+// Prototipo Vea -> /pt_vea
+app.get(["/pt_vea", "/pt_vea/*"], (req, res) => {
+  res.redirect(302, REDIRECTS.pt_vea);
+});
+
 // === Favicon ===
-// si acceden a /favicon.ico → sirve tu logo local
+// si acceden a /favicon.ico -> sirve tu logo local
 app.get("/favicon.ico", (req, res) => {
   res.sendFile(path.join(__dirname, "favicon.png"));
 });
 
 // Arranque del servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Proxy escuchando en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`Proxy escuchando en puerto ${PORT}`));

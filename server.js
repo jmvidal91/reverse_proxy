@@ -19,7 +19,7 @@ const URLS = {
   refresh_turnos: "https://n8n-railway-production-2eac.up.railway.app/webhook/a5afc7b2-5131-4fdd-8425-492551de3a37/refresh_turnos",
 };
 
-const REDIRECTS = {
+const PROTOTYPES = {
   pt_vea: "https://vea-turnos-prototipo.callappsystem.chatgpt.site",
 };
 
@@ -40,6 +40,24 @@ async function proxyRequest(baseUrl, id, res) {
   } catch (err) {
     console.error("Error en proxy:", err);
     res.status(500).send("Error en proxy");
+  }
+}
+
+async function proxyStaticPage(url, res) {
+  try {
+    const resp = await fetch(url);
+    const html = await resp.text();
+
+    res
+      .status(resp.status)
+      .set({
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store",
+      })
+      .send(html);
+  } catch (err) {
+    console.error("Error cargando prototipo:", err);
+    res.status(500).send("Error cargando prototipo");
   }
 }
 
@@ -77,7 +95,7 @@ app.get("/refresh_turnos/:cuentaCodigo", (req, res) => {
 
 // Prototipo Vea -> /pt_vea
 app.get(["/pt_vea", "/pt_vea/*"], (req, res) => {
-  res.redirect(302, REDIRECTS.pt_vea);
+  proxyStaticPage(PROTOTYPES.pt_vea, res);
 });
 
 // === Favicon ===
